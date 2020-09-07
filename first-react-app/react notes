@@ -1,0 +1,435 @@
+Simple ReactDom rendering: done on codepen
+
+HTML file:
+<div id="p1"></div>
+<div id="p2"></div>
+
+CSS file:
+.person{
+  display:inline-block;
+  border:1px solid #eee;
+  box-shadow: 0px 2px 2px #ccc;
+  padding:20px;
+  margin:10px;
+  width:200px;
+}
+
+JS file: import react and ReactDom preprocessor:babel
+
+function Person(props){
+  return (
+    <div className="person">
+      <h1>{props.name}</h1>
+      <p>Age : {props.age}</p>
+    </div>
+  );
+}
+
+ReactDOM.render(<Person name="Jayanti" age="22"/>,document.querySelector('#p1'));
+ReactDOM.render(<Person name="Srishti" age="21"/>,document.querySelector('#p2'));
+
+Different approach where only making 1 render call:()
+JS file: (additional to function Person)
+//what we are doing here is only making single render call and passing a variable app which holds multiple person tags that we want to call.
+
+//this app variable will hold JSX code
+//multiple person tags are wrapped inside a di single div element because jsx has the requirement of only one root element
+//we now call them being rendered in a single react hook or same element
+
+var app = (
+  <div>
+    <Person name="Jayanti" age="22"/>
+    <Person name="Deepshikha" age="21" />
+  </div>  
+);
+ReactDOM.render(app,document.querySelector('#app'));
+
+//Export and import concept:
+demo.js file
+
+const person = {
+  name:'Jayanti'
+};
+
+//it will if we import demo.js in some other file, by default person will be imported
+export default person
+
+import person from './demo.js'
+    or
+import pers fron './demo.js'   //i.e. the name can be different
+
+//a file can have multiple export statements, in that case import stmts will be like:
+import {person} from './demo.js'; //same variable name to be used
+     or
+import {person as PersonData} from './demo.js'
+     or
+import * as bundled from './demo.js'    //bundled here will be an object of all exported variables
+
+//In inheritance base class constructor has to be called in child class constructor using super() keyword if you want to use any base call methods through child class object.
+
+//newer syntax for declaring properties (variables) of class without this keyword i.e. no need to write constructor function to initialize properties.
+class Person {
+  name = 'Jayanti';
+  const myName = () => {
+    console.log(this.name);
+  }
+}
+
+//Spread and rest operator:
+spread:
+
+const newArr = [...oldArr,1.2]  //transder old to new variable and add two more element at the end
+const newObj = {...oldObj, newProp:5}  //add a key value pair at the end, if newprop already exist, overwrite.
+
+rest:
+function sortArgs(...args) {
+  return args.sort();
+}
+    or
+const filter = (...agrs) => {
+  return args.filter(el => el === 1);
+}
+
+console.log(filter(1,2,3));   // returns [1] i.e. an array
+
+//destructuring
+const numbers = [1,2,3];
+[num1,num2] = numbers; //1 and 2 allocated
+[num1, ,num2] = numbers; //1,3 allocated
+
+in objects name should be same as property
+
+
+
+
+//next module: In this we set up the react environment where we use modern js functions that gets converted in the bg and can be processed by older browsers too.
+
+
+//create a react app:
+step 1:
+>npm install create-react-app -g   //g for globally
+
+step 2:  first do cd to go to right directory
+>create-react-app appname 
+   or
+>create-react-app appname --scripts-version 1.1.5   //when you want to change the setup of your project given by react, you can change the script version to change the setup of project.
+
+//start app:
+>cd appname
+>npm start
+
+//instead of writong jsx code in render function of App.js, we can also write this, jsx code in the bg gets converted into this:
+
+//arguments: 1. tagname, 2. object passed to set configurations can be set to null to, 3. content inside the tag, can pass infinite number of agruments after that.
+
+    return React.createElement('div', {className : 'App'}, React.createElement('h1', null, 'Does this work?', 'it does'));
+
+// divs written in render are not actual html divs, these are jsx code each defined by react to act like an actual html div. like you can't use class keyword to add class to tags, you use className which gets converted in the bacground.
+
+//jsx restriction : can't have multiple root nodes, i.e. only one root div and others should be nested.
+
+//Creating components : there are two ways of doing it
+1. make a class and make it extend Component class, and export it.
+2. make a simple js function and export it.
+//In the simplest form, a component is a function returning some jsx code.
+
+
+//How to access data enclosed in a custom tag : through props.children
+eg: <Person name="Jayanti" age="22">My hobbies: Racing</Person>
+//not just properties, html structured data inside the tag can be accessed through props too.
+
+//in component file:
+
+const person = (props) => {
+  return (
+    <div>
+      <p>I am {props.name} and {props.age} years old.</p>
+      <p>{props.children}</p>
+    </div>
+  );
+}
+
+//Understanding state:
+when you want to access to data passed from outside in a component you use prop right, well if you want to get data from inside the component and change it from inside too, then you use 'state'.
+
+states can only be used in components made from extending Component class and not function components.
+React hooks are introduced in react 16.8 to be able to use state even in function components.
+
+Note:  Whenever state  changes, the component will re-render and reflect the new state. The difference to props  is, that this happens within one and the same component - you don't receive new data (props ) from outside!
+
+//Setting up event listners:
+
+just give the method reference in onclick and not include (), because then the method will be immediately invoked the moment react renders it to the dom.
+so we just write 'this' and dot the property name that holds the method
+<button onClick={this.switchNameHandler}>Switch names</button>
+
+//changing state with event listners:
+
+can't directly manipulate state by writing :
+  this.state.persons[0].name = "Jpesa"  in the callback function of event listners
+
+instead use a function which is provided by 'Component' class that we import i.e. setState method.
+setState takes an object consisitng of all updates.
+this.setState({
+  //pass the properties and values you want to change
+})
+
+after this react compares the object passed and existing state and merges the updates, which gets reflected on the DOM
+
+Note: Only State change and props change trigger react to render DOM
+
+On state and prop change : React analyses the code it already rendered to the DOM and the code it would now render if it were to re render everything and then it updates the existing DOM in the places where it needs to be to reflect the new state and props
+
+//Managing states in functional components:
+
+done using react hooks : its basically a set of functions given by react to use in functional component.
+
+import useState from react, useState is a function that will take the existing state (object) as a parameter and return exactly 2 values:
+    1. existing state object (exactly what it took as parameter)
+    2. a function which can update the existing state which react will be aware of and then rerender it to DOM. 
+    You then pass the updates state in this function
+
+const app = (props) => {
+  const [personState, setPersonState] = useState({
+    persons : [
+      {name: "Jayanti", age: 22},
+      {name:"Srishti", age:21}, 
+      {name: "Deepshikha", age:21},
+      {name: "Akansha", age:22}
+    ],
+  });
+
+  const switchNameHandler = () => {
+    setPersonState({
+      persons : [
+        {name: "Jpesa", age: 25},
+        {name:"Srishti", age:21}, 
+        {name: "Deepshikha", age:21},
+        {name: "Akansha", age:22}
+      ],
+    });
+
+    
+  };
+  
+  onClick={switchNameHandler}  //exclude the this. part
+
+}
+
+Note: useState does not merge states like setState, instead it replaces the old state with new one.
+So you gotta either manually pass unchanged values of old state along with changed values or use multiple useState stmts.
+
+//Stateful vs stateless:
+
+eg person.js which only takes info from outside and represnt in a structured manner is stateless coz no state management. also called dumb. these are presentational, dumb, stateless. should be used as many of these components possible in your app
+
+stateful : called smart or container components coz they contain state of your app
+
+Good practice: have more presentational components than container components coz it becomes easier to manage your app, gives you  a clear flow and data can be outputted in a clean manner, be able to differentiate it from main logic.
+
+//passing method references between components:
+you pass it the same way you pass properties in the component tag, you give reference of method. eg:
+    <Person 
+    name={this.state.persons[0].name} 
+    age={this.state.persons[0].age}
+    click={this.switchNameHandler}>I like to {this.state.hobby}</Person>
+
+in the component file you can access it with props.click
+
+//passing value to the event handler function: two methods
+
+1. since we can't include paranthesis at the onclick as it will be immediately executed, so we use bind.
+    onClick= {this.switchNameHandler.bind(this, 'Jayanti')};
+
+    switchNameHandler = (newName) => {};
+
+2. in the onclick method write an arrow function which will return the eventhandler method and pass the parameter in that. eg
+    onClick = {() => this.switchNameHandler('JayantiPesa')}
+this doesnt immediately get invoked, it returns a function which will be executed on click only. It can be efficient coz react can rerender to DOM multiple times.
+
+//Two way binding:
+in person.js, in the return div code add this:
+    <input type="text"  onChange={props.change} value={props.name}/>
+
+this field will take name and on change call a function defined in app.js that updates the state to the new name, and then the reference of this handler method is passed as a property in Person tag. 
+two way binding is done by setting value property of input field, coz with doing that we would be abe to see the current state right from the start
+
+//inline styling:
+make an object containing all js representation of css properties 
+to include the style in a button tag, add style property in the button tag and pass the style object written above 
+    <button style={styleObj} onClick={this.nameHndler} >
+
+note: we use inline style when we want to apply a style properties to a particular tag only, coz we pass the style object to that tag only
+
+IMP note: whenever react updates the UI, it runs the whole render method and not just the content inside the return statement.
+
+//conditional rendering of tags:
+render() {
+  let var_name = null;
+  if(stmt) {
+  //assign the jsx code you want to render to a variable
+  var_name = (some jsx code);
+}
+then in the return stmt, include the variable
+return(
+  {var_name}
+);
+}
+
+
+//printing list items:
+in angular we have ngFor to print print list, but in react we use plain js default tools to do it
+
+react won't be able to render objects inside js arrays directly to DOM, it requires jsx code
+so what we do is map the objects of js array to jsx objects which react will be able to pull out and render to screen.         basically covert js to jsx
+
+for that use map() and return a jsx code i.e <Person /> a html like tag.
+
+let person = (
+  <div>
+    {
+      this.state.persons.map(cur => {
+        return <Person name={cur.name} age={cur.age}>
+      })
+    }
+  </div>
+);
+
+//deleting an element from an array dynamically:
+
+  deleteNameHandler = (personIndex)=> {
+    const personData = this.state.persons;
+    personData.splice(personIndex,1);
+    this.setState({persons : personData});
+
+  }
+
+onClick= {this.deleteNameHandler.bind(this, index)}
+
+//changing state immutably : ie. how not to mutate the state variable first
+the above method is a bad practice coz, const personData is storing a pointer to the original array, and any change to personData is changing the orignal data which is not a good practice.
+so instead we should make a copy of it first
+ Solution : 1. use slice()
+            2. use [...] spread operator
+
+//lists & keys: 
+key prop is an important property that we should include when rendering lists of data
+key is default property expected by react whether its a custom component or a std html element which you render through a list ie. using map function on arrays
+
+key helps react in efficient rerendering.   how it works:
+when rerendering, react compares the current dom with the future dom that we will obtain from rerender.
+and only updates the changes to screen.
+in case of a list, it doesn't have any unique parameter to compare each and every list item to find change, hence it will render the entire list which is inefficient.
+
+so the key prop helps react to keep a clear track of elements and find out which chaged and which didn't and only rerender them
+
+//changing styles dynamically:
+
+you can directly access styleobj to change a property like:
+styleobj.backgroundColor : 'red';
+
+//dynamically adding a new class:
+const btnClass =[];
+if(some condition)
+  btnClass.push('a newClassName')
+
+pass this array in the className parameter but after joining all the array elements separated by space
+
+<p classname={btnClass.join(' ')}>hello</p>
+
+
+
+//including pseudo selectors dynamically : like btn:hover selector
+
+can't do it from plain js, gotta include a third party library
+
+npm install --save radium
+//--save to save entry in package.json with the package's version info and all
+
+//importing radium: 
+at the end of file where you import your component just do:
+export default Radium(App); 
+
+doing this, react will now be able to process some extra features for inline css and media queries
+
+//adding hover property in inline css:
+styleobj ={
+  color:'red',
+  backgroundColor:'white',
+  ':hover' : {
+      color: 'lightred',
+      backgroundColor : 'black'
+  }
+}
+
+to edit the hover prop:
+
+styleobj[':hover'] = {
+  //change props here
+}
+
+while accessing the hover prop, you dont use the dot operator coz its a string property, so access like array.
+
+note: if multiple elements are using this styleobj for inline css, make sure you give each of them unique key value, so radium can understand which element it is rendering . if you dont it gives error
+
+//using radium for media queries:
+for using pseudo selectors, just enwrapping app component in Radium component works, but incase of media queries and keyframes, you have to enwrap the entire code of App component( present in return() ) inside StyleRoot component imported from radium (like: <StyleRoot></StyleRoot>)
+ 
+//in app.js
+import radium, { StyleRoot } from 'radium';
+
+//in person.js
+const style = {
+        '@media (min-width: 500px)' : {
+            width: '450px'
+        }
+    }
+
+
+//enabling CSS module feature:
+basically we scope the external css file i.e. implement the feature of inline css (only styling the elements we want to )but using external css file
+
+we do that by importing the external css file into an object in the js file, where the properties of this object are basically the selectors present inside external file.
+
+this way we can use a selector used for all buttons from the external file but only style a specific button we want by passing it in inline in js file.
+
+Steps to unlock css modules:
+1.to be able to view and change configuration file: run eject command to make it editable
+npm run eject
+
+2. find config folder and go to webpack.config.dev.js
+webpack file is a tool sort of to perform transformations and ops to bundle and optimize our code together and take care of our css files
+
+in this file we change the way we handle our css and unlock css module feature
+
+restart your server after making changes to config files
+
+
+//Diving deeper into react Components:
+Note: components which are responsible for managing state like our container component App.js should not be involved in UI rendering to much.
+as in its render function should be lean and shouldn't contain muc jsx 
+
+// using props in class component:
+
+props can be used in class based components too, there you will be accessing it with 'this' variable.
+just directly use this.props.propertyName without taking props as arguement (as we do in functional component)
+
+<App appTitle="Person Manager" />
+
+
+//Component Lifecycle 
+1. creation Lifecycle
+constructor(props) --> getDerivedStateFromProps (props,state) --> render() --> render child components --> componentDidMount()
+
+getDerivedStateFromProps and render functions get called every time props or state changes.
+getDerivedStateFromProps syncs your local state to the props you are getting
+
+2. update lifecycle 
+getDerivedStateFromProps (props, state) -->shouldComponentUpdate(nextProps, nextState) --> render() -->update child component props --> getSnapshotBeforeUpdate(prevProps, prevState) --> componentDidUpdate()
+
+getSnapshotBeforeUpdate is used to retain the current properties before rerendering happens like retaining user's scroll position and keeping user at that position even after rerendering adds new content to page.
+
+componentDidUpdate(prevProps, prevState, snapshot)  takes three args, third is the data that is returned from getSnapshotBeforeUpdate function, that is here after update we now use the preserved data from snapshot function e.g. scroll position is maintained here.
+
+
+
